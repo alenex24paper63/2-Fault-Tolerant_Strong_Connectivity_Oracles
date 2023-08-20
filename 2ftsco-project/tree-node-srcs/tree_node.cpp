@@ -241,6 +241,52 @@ void TreeNode::decomposeNode(int removeVertex)
 	}
 }
 
+void TreeNode::decomposeNode(int removeVertex, bool init_aux_ds)
+{
+	// if graph has at atleast 2 vertices init choudhary d.s. and 1 fault and further
+	// decompose the node
+	if (this->n_nodes >= 2) {
+
+		if (init_aux_ds) {
+			/* initialize whole Choudhary data structure */
+			this->chObj = new Choudhary(this->graph, removeVertex);
+
+			/* initialize 1-Fault Tolerant Strong Connectivity Oracle */
+			this->oneFaultOracle = new oneFTSC(this->n_nodes, this->graph->out_edges, this->graph->out_edges_start_index);
+		}
+
+		scc_tarjan sccObj = scc_tarjan();
+		sccObj.decomposeSCC(this->graph, removeVertex);
+
+		this->n_chil = sccObj.t_cc;
+		// cout<<"\n#ch = "<<n_chil<<"\n\n";
+		if (n_chil > 0) {
+			// construct child nodes from sccs
+			for (int i = 0; i < n_chil; i++) {
+				// cout<<"~> ";
+				// sccObj.cc_array[i] -> PrintVertices();
+				addChild(sccObj.cc_array[i], i);
+				// cout<<endl;
+			}
+			// shrink array from n to n_chil
+			shrinkChildrenArray();
+			// cout<<"\ndepth = "<<this->node_depth<<"\n";
+		}
+		else {
+			// if there aren't any children release the arrays - no need to keep
+			// them
+			delete[] vertexMap;
+			vertexMap = nullptr;
+			// delete[] vertexMapReverse;
+			// vertexMapReverse = nullptr;
+			delete[] vertex2children;
+			vertex2children = nullptr;
+			delete[] children;
+			children = nullptr;
+		}
+	}
+}
+
 void TreeNode::decomposeNode(int removeVertex, int global_id, string graph_name)
 {
 
