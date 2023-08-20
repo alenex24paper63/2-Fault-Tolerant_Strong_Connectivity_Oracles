@@ -17,11 +17,11 @@ int cndp::common::Utilities::TOTAL_SLEEP_MICROSECONDS = 0; // used for the rando
 const char *filename; // substring of input file name
 cndp::common::DimacsGraph *inputGraph = nullptr;
 std::string graph_name;
-int sccs_ID = 0;	 // used for the mapping of the tree nodes to the files - also max{sccs_ID} = number of nodes in dec. tree
-int algo2use = 1;	 // used for the selection of the algorithm/ heuristic method - defaut 1 = critical node;
-int tree_depth = 0;	 // depth of decomposition tree
-int total_nodes = 0; // number of nodes for the input graph
-
+int sccs_ID = 0;		// used for the mapping of the tree nodes to the files - also max{sccs_ID} = number of nodes in dec. tree
+int algo2use = 1;		// used for the selection of the algorithm/ heuristic method - defaut 1 = critical node;
+int tree_depth = 0;		// depth of decomposition tree
+int total_nodes = 0;	// number of nodes for the input graph
+bool initialize_ds = 0; // initialize aux data structures [2-FT-SSR-O, 1-FT-SC-O] and answer 1M random queries (avg. case)
 /* store queries as 2-d array - {x,y,f1,f2} = {queries[i][0],...,queries[i][3]} */
 int num_of_queries = 0;
 int **queries = nullptr;
@@ -33,31 +33,42 @@ bool TwoFaultTolerantStrongConnectivityQuery(TreeNode *node, int x, int y, int f
 void checkStartingParameters(int argc, char *argv[])
 {
 	std::string algos[6] = {"RANDOM", "MCN", "LABEL_PROPAGATION", "PAGE_RANK", "Q-SEPARATOR+MCN", "MCN + 3-CONNECTED"};
-	if (argc <= 1 || argc > 3) {
-		printf("\nUsage: %s <input file> [optional] <int>\n\n", argv[0]);
-		printf("int: select algorithm\nRANDOM = 0\nMCN = 1 [default]\nLABEL "
+	if (argc != 4) {
+		printf("\nUsage: %s <input file> [algorithm] <int> [initialize-data-structures] <bool>\n\n", argv[0]);
+		printf("int: select algorithm\nRANDOM = 0\nMCN = 1\nLABEL "
 			   "PROP = 2\nPAGE RANK = 3\nQ-SEPARATOR+MCN = 4\nMCN + 3-CONNECTED "
-			   "CHECK FOR 2-CONNECTED SUBGRAPHS = 5\n");
+			   "CHECK FOR 2-CONNECTED SUBGRAPHS = 5\n\n"
+			   "bool: initialize data structures for the queries [2-FT-SSR-O, 1-FT-SC-O]\n[default = 0]\n\n");
+		printf("\n\n---- END ----\n\n");
 		exit(-1);
-	}
-	else if (argc == 2) {
-		filename = argv[1];
 	}
 	else {
 		filename = argv[1];
 		algo2use = atoi(argv[2]);
+		initialize_ds = atoi(argv[3]);
+		if (algo2use == 4 && initialize_ds == true) {
+			printf("Q-SEP + MCN doesn't support answering queries.\nQ-SEP + MCN is used only for the tree height experiments.");
+			printf("\n\n---- END ----\n\n");
+			exit(-1);
+		}
 	}
 	graph_name = std::string(filename);
 	int len = graph_name.length() - 4 - 7;
 	graph_name = graph_name.substr(7, len);
-	if(algo2use < 0 || algo2use > 5){
-		printf("\nUsage: %s <input file> [optional] <int>\n\n", argv[0]);
-		printf("int: select algorithm\nRANDOM = 0\nMCN = 1 [default]\nLABEL "
+	if (algo2use < 0 || algo2use > 5) {
+		printf("\nUsage: %s <input file> [algorithm] <int> [initialize-data-structures] <bool>\n\n", argv[0]);
+		printf("int: select algorithm\nRANDOM = 0\nMCN = 1\nLABEL "
 			   "PROP = 2\nPAGE RANK = 3\nQ-SEPARATOR+MCN = 4\nMCN + 3-CONNECTED "
-			   "CHECK FOR 2-CONNECTED SUBGRAPHS = 5\n");
+			   "CHECK FOR 2-CONNECTED SUBGRAPHS = 5\n\n"
+			   "bool: initialize data structures for the queries [2-FT-SSR-O, 1-FT-SC-O]\n[default = 0]\n\n");
+		printf("\n\n---- END ----\n\n");
 		exit(-1);
 	}
 	printf("Algorithm used for the decomposition: %s\n", algos[algo2use].c_str());
+	if (initialize_ds) {
+		printf("Initialize 2-FT-SSR-O and 1-FT-SC-O for every node of the tree.\n");
+	}
+	srand(time(NULL)); /* comment this line if you want fixed seed for RANDOM algorithm */
 }
 
 void dfs_sub(cndp::common::DimacsGraph *G, int source, int destination, bool *visited)
