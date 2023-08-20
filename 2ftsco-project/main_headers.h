@@ -36,8 +36,7 @@ void checkStartingParameters(int argc, char *argv[])
 	if (argc != 4) {
 		printf("\nUsage: %s <input file> [algorithm] <int> [initialize-data-structures] <bool>\n\n", argv[0]);
 		printf("int: select algorithm\nRANDOM = 0\nMCN = 1\nLABEL "
-			   "PROP = 2\nPAGE RANK = 3\nQ-SEPARATOR+MCN = 4\nMCN + 3-CONNECTED "
-			   "CHECK FOR 2-CONNECTED SUBGRAPHS = 5\n\n"
+			   "PROP = 2\nPAGE RANK = 3\nQ-SEPARATOR+MCN = 4\n\n"
 			   "bool: initialize data structures for the queries [2-FT-SSR-O, 1-FT-SC-O]\n[default = 0]\n\n");
 		printf("\n\n---- END ----\n\n");
 		exit(-1);
@@ -55,11 +54,10 @@ void checkStartingParameters(int argc, char *argv[])
 	graph_name = std::string(filename);
 	int len = graph_name.length() - 4 - 7;
 	graph_name = graph_name.substr(7, len);
-	if (algo2use < 0 || algo2use > 5) {
+	if (algo2use < 0 || algo2use > 4) {
 		printf("\nUsage: %s <input file> [algorithm] <int> [initialize-data-structures] <bool>\n\n", argv[0]);
 		printf("int: select algorithm\nRANDOM = 0\nMCN = 1\nLABEL "
-			   "PROP = 2\nPAGE RANK = 3\nQ-SEPARATOR+MCN = 4\nMCN + 3-CONNECTED "
-			   "CHECK FOR 2-CONNECTED SUBGRAPHS = 5\n\n"
+			   "PROP = 2\nPAGE RANK = 3\nQ-SEPARATOR+MCN = 4\n\n"
 			   "bool: initialize data structures for the queries [2-FT-SSR-O, 1-FT-SC-O]\n[default = 0]\n\n");
 		printf("\n\n---- END ----\n\n");
 		exit(-1);
