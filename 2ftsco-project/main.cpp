@@ -179,11 +179,12 @@ void constructTree(TreeNode *node)
 		}
 		else {
 			// remove only a critical node
-			node->decomposeNode(criticalNode(node->graph));
+			node->decomposeNode(criticalNode(node->graph), false); // do not init aux ds because qsep+mcn tree doesn't support answering queries.
+																   // it's only used for the tree height experiments
 		}
 	}
 	else {
-		node->decomposeNode(selectVertex(node));
+		node->decomposeNode(selectVertex(node), initialize_ds);
 	}
 
 	for (int i = 0; i < node->n_chil; i++) {
@@ -320,7 +321,7 @@ void avgCaseQueries(TreeNode *obj, int num_of_q)
 	}
 	double t = timer.reset();
 
-	cout << "~~~~~~ " + graph_name + " ~~~~~~~\n";
+	cout << "~~~~~~~ " + graph_name + " ~~~~~~~\n";
 	cout << "#total queries: " << num_of_q << "\n";
 	cout << "total time (s):\t" << t << "\n";
 	cout << "avg. time (s):\t" << t / (double)num_of_q << "\n";
@@ -333,6 +334,8 @@ void avgCaseQueries(TreeNode *obj, int num_of_q)
 	cout << "avg. 2-FT-SSR-O calls:\t" << ch_sum / (double)num_of_q << "\n";
 	cout << "1-FT-SC-O calls:\t" << onef_sum << "\n";
 	cout << "avg. 1-FT-SC-O:\t" << onef_sum / (double)num_of_q << "\n";
+	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+	
 }
 
 void checkInputGraphBeginConstruction(cndp::common::DimacsGraph *G)
@@ -356,10 +359,10 @@ void checkInputGraphBeginConstruction(cndp::common::DimacsGraph *G)
 		printf("time needed: %f\n", t.reset());
 		findTreeDepth(root);
 		
-		/* uncomment following two lines in order to test avg case queries. Aux data structures should be initiliazed during the decomposition.
-		 * See readme for more info */
-		// num_of_queries = 1000000;
-		// avgCaseQueries(root, num_of_queries);
+		if (initialize_ds) {
+			num_of_queries = 1000000;
+			avgCaseQueries(root, num_of_queries);
+		}
 
 		cleanPointers(root);
 	}
