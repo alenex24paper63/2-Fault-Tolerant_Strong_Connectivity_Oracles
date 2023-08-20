@@ -27,6 +27,7 @@ class TreeNode {
 	void decomposeNode(int removeVertex, int ID, std::string graph_name);
 
 	void decomposeNode(bool *separator);
+	void decomposeNode(int removeVertex, bool init_aux_ds);
 	void decomposeNode(bool *separator, int sep_size, int ID, std::string graph_name);
 	Choudhary **store_ch_for_sep = nullptr;
 	bool removed_separator = false;
